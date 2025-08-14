@@ -102,7 +102,7 @@
     <ul>
   <li><i class="fal fa-phone-alt"></i> <a href="tel:+916374471124" class="text-dark">+91 63744 71124</a></li>
   <li><i class="fal fa-phone-alt"></i> <a href="tel:+917598064945" class="text-dark">+91 75980 64945</a></li>
-  <li><i class="fal fa-envelope"></i> <a href="mailto:info@gmail.com" class="text-dark">info@gmail.com</a></li>
+  <li><i class="fal fa-envelope"></i> <a href="mailto:Mailtobalanewz@gmail.com" class="text-dark">Mailtobalanewz@gmail.com</a></li>
   <li><i class="fal fa-map-marker-alt"></i> <a href="https://maps.app.goo.gl/C75ryZXwHZzgRzhb6" class="text-dark">12/7 New Town, Anna Nagar, Chennai, Tamil Nadu - 600040, India</a></li>
 </ul>
 
@@ -252,7 +252,7 @@
                             <div class="contact-box__icon"><i class="far fa-envelope"></i></div>
                             <div class="media-body">
                                 <h4 class="contact-box__label">Email</h4>
-                                <p class="contact-box__info"><a href="mailto:info@example.com">info@example.com</a>
+                                <p class="contact-box__info"><a href="mailto:Mailtobalanewz@gmail.com">Mailtobalanewz@gmail.com</a>
                                 </p>
                             </div>
                         </div>
@@ -270,35 +270,36 @@
                     <div class="contact-box">
                         <h3 class="contact-box__title h4">Leave a Message</h3>
                         <p class="contact-box__text">We’re Ready To Help You</p>
-                        <form class="contact-box__form ajax-contact" action="mail.php" method="POST">
-                            <div class="row gx-20">
-                                <div class="col-md-6 form-group">
-                                    <input type="text" name="name" id="name" placeholder="Your Name">
-                                    <i class="fal fa-user"></i>
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <input type="email" name="email" id="email" placeholder="Email Address">
-                                    <i class="fal fa-envelope"></i>
-                                </div>
-                                <div class="col-12 form-group">
-                                    <select name="subject" id="subject">
-                    <option selected="" disabled="" hidden="">Select subject</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="UI Design">UI Design</option>
-                    <option value="CMS Development">CMS Development</option>
-                    <option value="Theme Development">Theme Development</option>
-                    <option value="Wordpress Development">Wordpress Development</option>
-                  </select>
-                                </div>
-                                <div class="col-12 form-group">
-                                    <textarea name="message" id="message" placeholder="Type Your Message"></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <button class="vs-btn">Submit Message<i class="far fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-                        </form>
-                        <p class="form-messages mb-0 mt-3"></p>
+                     <form class="contact-box__form ajax-contact" id="contact-form">
+  <div class="row gx-20">
+    <div class="col-md-6 form-group">
+      <input type="text" name="name" id="name" placeholder="Your Name" required />
+      <i class="fal fa-user"></i>
+    </div>
+    <div class="col-md-6 form-group">
+      <input type="email" name="email" id="email" placeholder="Email Address" required />
+      <i class="fal fa-envelope"></i>
+    </div>
+    <div class="col-12 form-group">
+      <input type="tel" name="phone" id="phone" placeholder="Phone Num" required />
+      <i class="fal fa-phone-alt"></i>
+    </div>
+    <div class="col-12 form-group">
+      <input type="text" name="subject" id="subject" placeholder="Subject" required />
+     
+    </div>
+    <div class="col-12 form-group">
+      <textarea name="message" id="message" placeholder="Type Your Message" required></textarea>
+    </div>
+    <div class="col-12">
+      <button class="vs-btn" type="submit">Submit Message<i class="far fa-arrow-right"></i></button>
+    </div>
+  </div>
+</form>
+<p class="form-messages mb-0 mt-3"></p>
+
+
+
                     </div>
                 </div>
             </div>
@@ -438,5 +439,71 @@
     <!-- Main Js File -->
     <script src="assets/js/main.js"></script>
 </body>
+
+
+<!-- email submission -->
+
+<script>
+  document.getElementById('contact-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+    const subject = form.subject.value.trim();
+    const message = form.message.value.trim();
+    const access_key = "9ab391fd-98e1-475f-a9a4-645011d14ca7";
+    const formMessages = document.querySelector('.form-messages');
+
+    if (!name || !email || !phone || !subject || !message) {
+      formMessages.textContent = "Please fill all the fields.";
+      formMessages.style.color = "red";
+      return;
+    }
+
+    const data = {
+      access_key,
+      name,
+      email,
+      phone,
+      subject,
+      message
+    };
+
+    try {
+      // Send data to Web3Forms
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        formMessages.textContent = "Message sent successfully!";
+        formMessages.style.color = "green";
+
+        // WhatsApp message
+        const whatsappNumber = "917598064945";
+        const whatsappMessage = encodeURIComponent(
+          `New Contact Message:\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nSubject: ${subject}\nMessage: ${message}`
+        );
+
+        window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`, '_blank');
+
+        form.reset();
+      } else {
+        formMessages.textContent = "Failed to send message. Please try again.";
+        formMessages.style.color = "red";
+      }
+    } catch (error) {
+      formMessages.textContent = "Network error. Please try again.";
+      formMessages.style.color = "red";
+    }
+  });
+</script>
+
 
 </html>
